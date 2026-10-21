@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Progressão de cargas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&amp;family=Barlow:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E13}
+a{color:#5AA9FF}a:hover{color:#8FC5FF}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+input:focus{outline:2px solid #5AA9FF;outline-offset:2px}
+button:focus-visible{outline:2px solid #E9EDF3;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1080px; height: 1350px; box-sizing: border-box; padding: 56px 64px; background: #0B0E13; color: #E9EDF3; font-family: 'Barlow', sans-serif; display: flex; flex-direction: column; gap: 26px">
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px; letter-spacing: 0.2em; color: #8A94A6">REGISTRE O TREINO E VEJA O PRÓXIMO PASSO</div>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 76px; line-height: 1">PROGRESSÃO DE CARGAS</h1>
+</div>
+
+<div style="display: flex; gap: 10px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="6">
+<button type="button" onClick="{{d.pick}}" style="flex: 1 1 0; height: 52px; border-radius: 12px; border: 1px solid {{d.border}}; background: {{d.bg}}; color: {{d.fg}}; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer">{{d.label}}</button>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 16px; font-weight: 700; letter-spacing: 0.14em; color: {{accent}}">{{dayTitle}}</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{exs}}" as="x" hint-placeholder-count="6">
+<button type="button" onClick="{{x.pick}}" style="min-height: 64px; box-sizing: border-box; padding: 10px 16px; border-radius: 12px; border: 2px solid {{x.border}}; background: {{x.bg}}; color: #E9EDF3; text-align: left; display: flex; flex-direction: column; justify-content: center; gap: 2px; cursor: pointer; font-family: 'Barlow', sans-serif">
+<span style="font-size: 19px; font-weight: 600; line-height: 1.2">{{x.n}}</span>
+<span style="font-size: 15px; color: #8A94A6">{{x.meta}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="background: #12161D; border: 1px solid #232A35; border-radius: 20px; padding: 28px 32px; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 700; line-height: 1.05">{{exName}}</div>
+<div style="font-size: 18px; color: #C4CBD6">{{goal}}</div>
+</div>
+
+<sc-if value="{{hasLoad}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="carga" style="font-size: 17px; font-weight: 600; color: #C4CBD6">{{loadLabel}}</label>
+<input id="carga" type="number" inputmode="decimal" min="0" step="0.5" value="{{load}}" onChange="{{setLoad}}" placeholder="Ex.: 20" style="height: 56px; box-sizing: border-box; padding: 0 20px; border-radius: 14px; border: 1px solid #2E3643; background: #0B0E13; color: #E9EDF3; font-family: 'Barlow', sans-serif; font-size: 22px">
+</div>
+</sc-if>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+<sc-for list="{{series}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="{{s.id}}" style="font-size: 17px; font-weight: 600; color: #C4CBD6">{{s.label}}</label>
+<input id="{{s.id}}" type="number" inputmode="numeric" min="0" step="1" value="{{s.val}}" onChange="{{s.set}}" placeholder="{{s.ph}}" style="height: 56px; box-sizing: border-box; padding: 0 20px; border-radius: 14px; border: 1px solid #2E3643; background: #0B0E13; color: #E9EDF3; font-family: 'Barlow', sans-serif; font-size: 22px">
+</div>
+</sc-for>
+</div>
+
+<div style="display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; border-radius: 14px; background: {{resBg}}" aria-live="polite">
+<div style="width: 44px; height: 44px; border-radius: 12px; background: #0B0E13; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{resColor}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{resIcon}}"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 24px; font-weight: 700; color: {{resColor}}">{{resTitle}}</div>
+<div style="font-size: 18px; line-height: 1.4; color: #C4CBD6">{{resBody}}</div>
+</div>
+</div>
+</div>
+
+<div style="flex-grow: 1; background: #12161D; border: 1px solid #232A35; border-radius: 20px; padding: 24px 32px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 16px; font-weight: 700; letter-spacing: 0.14em; color: #8A94A6">COMO FUNCIONA</div>
+<div style="display: flex; gap: 12px; font-size: 18px; line-height: 1.4; color: #C4CBD6"><span style="color: #5BD68A; font-weight: 700">Aumente</span><span>quando completar o topo da faixa em todas as séries.</span></div>
+<div style="display: flex; gap: 12px; font-size: 18px; line-height: 1.4; color: #C4CBD6"><span style="color: #5AA9FF; font-weight: 700">Mantenha</span><span>enquanto estiver dentro da faixa, com 1–2 repetições de reserva.</span></div>
+<div style="display: flex; gap: 12px; font-size: 18px; line-height: 1.4; color: #C4CBD6"><span style="color: #FF9A4D; font-weight: 700">Reduza</span><span>cerca de 10% se ficar abaixo do mínimo em dois treinos seguidos.</span></div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":1350}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { d: 0, e: 0, load: {}, reps: {} };
+  }
+  renderVals() {
+    // [nome, séries, faixa exibida, mínimo, máximo, equipamento, unidade extra]
+    // equipamento: h2 = par de halteres, h1 = um halter, b = barra, p = polia, l = livre, t = tempo
+    const PLAN = [
+      { label: 'SEG', title: 'SEGUNDA · PEITO, OMBROS E TRÍCEPS A', c: '#5AA9FF', soft: 'rgba(90,169,255,0.12)', ex: [
+        ['Supino reto com halteres', 3, '6–10', 6, 10, 'h2', ''],
+        ['Supino inclinado com halteres', 3, '8–12', 8, 12, 'h2', ''],
+        ['Desenvolvimento com halteres', 2, '8–12', 8, 12, 'h2', ''],
+        ['Elevação lateral', 3, '12–15', 12, 15, 'h2', ''],
+        ['Crucifixo na polia', 2, '10–15', 10, 15, 'p', ''],
+        ['Tríceps na polia', 2, '10–15', 10, 15, 'p', '']] },
+      { label: 'TER', title: 'TERÇA · COSTAS E BÍCEPS A', c: '#5BD68A', soft: 'rgba(91,214,138,0.12)', ex: [
+        ['Puxada alta na polia', 3, '8–12', 8, 12, 'p', ''],
+        ['Remada curvada com barra', 3, '6–10', 6, 10, 'b', ''],
+        ['Remada unilateral com halter', 2, '8–12', 8, 12, 'h1', ''],
+        ['Pullover na polia', 2, '12–15', 12, 15, 'p', ''],
+        ['Rosca direta com barra', 3, '8–12', 8, 12, 'b', ''],
+        ['Rosca martelo com halteres', 2, '10–15', 10, 15, 'h2', '']] },
+      { label: 'QUA', title: 'QUARTA · PERNAS E CORE A', c: '#FF9A4D', soft: 'rgba(255,154,77,0.12)', ex: [
+        ['Agachamento goblet', 3, '8–12', 8, 12, 'h1', ''],
+        ['Terra romeno com halteres', 3, '8–12', 8, 12, 'h2', ''],
+        ['Afundo reverso com halteres', 2, '10', 8, 10, 'h2', 'por perna'],
+        ['Elevação de panturrilhas', 3, '12–20', 12, 20, 'l', ''],
+        ['Crunch abdominal na polia', 3, '12–15', 12, 15, 'p', ''],
+        ['Prancha abdominal', 3, '30–60', 30, 60, 't', '']] },
+      { label: 'QUI', title: 'QUINTA · PEITO, OMBROS E TRÍCEPS B', c: '#5AA9FF', soft: 'rgba(90,169,255,0.12)', ex: [
+        ['Supino inclinado com halteres', 3, '6–10', 6, 10, 'h2', ''],
+        ['Supino reto com barra ou halteres', 2, '8–12', 8, 12, 'l', ''],
+        ['Elevação lateral na polia', 3, '12–15', 12, 15, 'p', ''],
+        ['Crucifixo inverso com halteres', 3, '12–15', 12, 15, 'h2', ''],
+        ['Face pull na polia', 2, '12–15', 12, 15, 'p', ''],
+        ['Tríceps francês com halter', 3, '10–12', 10, 12, 'h1', '']] },
+      { label: 'SEX', title: 'SEXTA · COSTAS E BÍCEPS B', c: '#5BD68A', soft: 'rgba(91,214,138,0.12)', ex: [
+        ['Puxada alta com pegada neutra', 3, '8–12', 8, 12, 'p', ''],
+        ['Remada baixa na polia', 3, '8–12', 8, 12, 'p', ''],
+        ['Remada com peito apoiado no banco', 2, '10–12', 10, 12, 'h2', ''],
+        ['Pullover com braços estendidos na polia', 2, '12–15', 12, 15, 'p', ''],
+        ['Rosca inclinada com halteres', 3, '10–12', 10, 12, 'h2', ''],
+        ['Rosca concentrada', 2, '10–15', 10, 15, 'h1', '']] },
+      { label: 'SÁB', title: 'SÁBADO · PERNAS E CORE B', c: '#FF9A4D', soft: 'rgba(255,154,77,0.12)', ex: [
+        ['Agachamento com halteres', 3, '10–12', 10, 12, 'h2', ''],
+        ['Agachamento búlgaro', 3, '8–12', 8, 12, 'h2', 'por perna'],
+        ['Terra romeno unilateral', 2, '10–12', 10, 12, 'h1', 'por perna'],
+        ['Elevação de panturrilhas', 3, '12–20', 12, 20, 'l', ''],
+        ['Crunch abdominal com carga', 3, '12–15', 12, 15, 'l', ''],
+        ['Prancha lateral', 2, '30–45', 30, 45, 't', 'por lado']] }
+    ];
+    const s = this.state;
+    const day = PLAN[s.d];
+    const [name, sets, range, lo, hi, eq, per] = day.ex[s.e];
+    const key = s.d + '-' + s.e;
+    const isT = eq === 't';
+    const unit = isT ? ' s' : '';
+    const fmtRange = (x) => x[2] + (x[5] === 't' ? ' s' : '') + (x[6] ? ' ' + x[6] : '');
+    const num = (v) => String(Math.round(v * 10) / 10).replace('.', ',');
+
+    const days = PLAN.map((p, i) => ({
+      label: p.label,
+      bg: i === s.d ? p.c : '#151A22',
+      fg: i === s.d ? '#0B0E13' : '#C4CBD6',
+      border: i === s.d ? p.c : '#232A35',
+      pick: () => this.setState({ d: i, e: 0 })
+    }));
+    const exs = day.ex.map((x, i) => ({
+      n: x[0],
+      meta: x[1] + ' séries · ' + fmtRange(x),
+      bg: i === s.e ? day.soft : '#12161D',
+      border: i === s.e ? day.c : '#232A35',
+      pick: () => this.setState({ e: i })
+    }));
+
+    const reps = s.reps[key] || [];
+    const loadStr = s.load[key] ?? '';
+    const load = parseFloat(String(loadStr).replace(',', '.'));
+    const hasLoadVal = !isNaN(load) && load > 0;
+
+    const series = Array.from({ length: sets }, (_, i) => ({
+      id: 'serie-' + i,
+      label: 'Série ' + (i + 1) + (isT ? ' (segundos)' : ''),
+      ph: isT ? 'Ex.: 45' : 'Ex.: ' + lo,
+      val: reps[i] ?? '',
+      set: (ev) => {
+        const v = ev.target.value;
+        this.setState((st) => {
+          const r = (st.reps[key] || []).slice();
+          r[i] = v;
+          return { reps: { ...st.reps, [key]: r } };
+        });
+      }
+    }));
+    const setLoad = (ev) => {
+      const v = ev.target.value;
+      this.setState((st) => ({ load: { ...st.load, [key]: v } }));
+    };
+
+    const loadLabels = { h2: 'Carga por halter (kg)', h1: 'Carga do halter (kg)', b: 'Carga total na barra (kg)', p: 'Carga na polia (kg)', l: 'Carga (kg) · use 0 se for só o peso do corpo' };
+    const nextLoad = () => {
+      if (eq === 'p') return hasLoadVal ? 'suba para a próxima placa (cerca de ' + num(load + 2.5) + ' a ' + num(load + 5) + ' kg)' : 'suba uma placa na polia';
+      if (eq === 'b') return hasLoadVal ? 'use ' + num(load + 2.5) + ' a ' + num(load + 5) + ' kg na barra' : 'acrescente 2,5 a 5 kg na barra';
+      if (eq === 'h2') return hasLoadVal ? 'use ' + num(load + 2) + ' kg por halter' : 'acrescente 1 a 2 kg por halter';
+      if (eq === 'h1') return hasLoadVal ? 'use um halter de ' + num(load + 2) + ' kg' : 'use um halter 1 a 2 kg mais pesado';
+      return hasLoadVal ? 'use cerca de ' + num(load + 2) + ' kg' : 'acrescente uma carga pequena';
+    };
+
+    const vals = series.map((x) => parseFloat(String(x.val).replace(',', '.')));
+    const filled = vals.every((v) => !isNaN(v));
+    const perTxt = per ? ' ' + per : '';
+    let resTitle, resBody, resColor, resIcon, resBg;
+    if (!filled) {
+      resTitle = 'Registre as ' + sets + ' séries';
+      resBody = 'Meta: ' + sets + ' séries de ' + range + unit + perTxt + '. Preencha o que fez para ver a recomendação.';
+      resColor = '#8A94A6'; resIcon = 'M12 8v5M12 16.5v.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z'; resBg = '#0E1218';
+    } else if (vals.every((v) => v >= hi)) {
+      resTitle = isT ? 'Aumente o tempo' : 'Aumente a carga';
+      resBody = isT
+        ? 'Você chegou a ' + hi + ' s em todas as séries. No próximo treino, segure 10–15 s a mais ou coloque um peso leve sobre o corpo.'
+        : 'Você completou ' + hi + ' repetições' + perTxt + ' nas ' + sets + ' séries. No próximo treino, ' + nextLoad() + '. As repetições vão cair um pouco; volte a subir até ' + hi + '.';
+      resColor = '#5BD68A'; resIcon = 'M3 17l6-6 4 4 8-8M15 7h6v6'; resBg = 'rgba(91,214,138,0.10)';
+    } else if (vals.some((v) => v < lo)) {
+      resTitle = isT ? 'Tempo abaixo da meta' : 'Carga acima do ideal';
+      resBody = isT
+        ? 'Uma ou mais séries ficaram abaixo de ' + lo + ' s. Mantenha o exercício e tente somar alguns segundos por treino.'
+        : 'Uma ou mais séries ficaram abaixo de ' + lo + ' repetições. Mantenha a carga no próximo treino; se acontecer de novo, ' + (hasLoadVal ? 'reduza para cerca de ' + num(Math.round(load * 0.9 * 2) / 2) + ' kg.' : 'reduza cerca de 10%.');
+      resColor = '#FF9A4D'; resIcon = 'M3 7l6 6 4-4 8 8M15 17h6v-6'; resBg = 'rgba(255,154,77,0.10)';
+    } else {
+      resTitle = 'Mantenha a carga atual';
+      resBody = isT
+        ? 'Busque chegar a ' + hi + ' s nas ' + sets + ' séries antes de dificultar o exercício.'
+        : 'Busque completar ' + hi + ' repetições' + perTxt + ' nas ' + sets + ' séries antes de aumentar o peso.';
+      resColor = '#5AA9FF'; resIcon = 'M5 12h14'; resBg = 'rgba(90,169,255,0.10)';
+    }
+
+    return {
+      days, exs, series, setLoad,
+      accent: day.c,
+      dayTitle: day.title,
+      exName: name,
+      goal: 'Meta: ' + sets + ' séries de ' + range + unit + perTxt + (isT ? '.' : ' repetições. Registre o que fez para saber se já pode aumentar a carga.'),
+      hasLoad: !isT,
+      loadLabel: loadLabels[eq] || 'Carga (kg)',
+      load: loadStr,
+      resTitle, resBody, resColor, resIcon, resBg
+    };
+  }
+}
+</script>
+</body>
+</html>

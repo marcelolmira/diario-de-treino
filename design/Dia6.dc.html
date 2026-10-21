@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Sábado – Pernas e core B</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&amp;family=Barlow:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E13}
+a{color:#FF9A4D}a:hover{color:#FFB880}
+</style>
+</helmet>
+<div style="width: 1080px; height: 1350px; box-sizing: border-box; padding: 60px 64px; background: #0B0E13; color: #E9EDF3; font-family: 'Barlow', sans-serif; display: flex; flex-direction: column; gap: 28px; border-top: 12px solid {{accent}}">
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 28px; letter-spacing: 0.18em; color: {{accent}}">{{weekday}} · TREINO {{ab}}</div>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 84px; line-height: 0.95">{{title}}</h1>
+<div style="font-size: 22px; color: #C4CBD6">45–60 min · 1–2 repetições de reserva · aquecimento antes do primeiro exercício pesado</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; flex-direction: column; background: #12161D; border: 1px solid #232A35; border-radius: 20px; overflow: hidden">
+<div style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 84px 124px 104px 112px; padding: 16px 24px; background: #0E1218; border-bottom: 1px solid #232A35; font-size: 15px; font-weight: 700; letter-spacing: 0.1em; color: #8A94A6">
+<div>#</div><div>EXERCÍCIO</div><div style="text-align: center">SÉRIES</div><div style="text-align: center">REPS</div><div style="text-align: center">DESCANSO</div><div style="text-align: center">CARGA</div>
+</div>
+<sc-for list="{{ex}}" as="e" hint-placeholder-count="6">
+<div style="flex-grow: 1; display: grid; grid-template-columns: 56px minmax(0, 1fr) 84px 124px 104px 112px; align-items: center; padding: 0 24px; border-bottom: 1px solid #1C222C">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: {{soft}}; color: {{accent}}; font-weight: 700; font-size: 21px; display: flex; align-items: center; justify-content: center">{{e.i}}</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-right: 12px">
+<div style="font-size: 28px; font-weight: 600; line-height: 1.15">{{e.n}}</div>
+<div style="font-size: 17px; color: #8A94A6">{{e.kind}}</div>
+</div>
+<div style="text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 42px; font-weight: 700">{{e.s}}</div>
+<div style="display: flex; flex-direction: column; align-items: center">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 700; line-height: 1">{{e.r}}</div>
+<div style="font-size: 14px; color: #8A94A6">{{e.per}}</div>
+</div>
+<div style="text-align: center; font-size: 20px; font-weight: 500; color: #C4CBD6">{{e.d}}</div>
+<div style="display: flex; justify-content: center"><div style="width: 92px; height: 48px; box-sizing: border-box; border: 1.5px dashed #3A4352; border-radius: 10px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 8px 4px; font-size: 13px; color: #6B7586">{{e.unit}}</div></div>
+</div>
+</sc-for>
+</div>
+
+<div style="display: flex; gap: 20px">
+<div style="flex: 1 1 0; background: #12161D; border: 1px solid #232A35; border-radius: 20px; padding: 24px 28px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 15px; font-weight: 700; letter-spacing: 0.16em; color: {{accent}}">PRIORIDADE</div>
+<div style="font-size: 22px; line-height: 1.35">{{prio}}</div>
+</div>
+<div style="flex: 1 1 0; background: #12161D; border: 1px solid #232A35; border-radius: 20px; padding: 24px 28px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 15px; font-weight: 700; letter-spacing: 0.16em; color: {{accent}}">PROGRESSÃO</div>
+<div style="font-size: 20px; line-height: 1.35; color: #C4CBD6">Completou o topo da faixa em todas as séries? Aumente a carga no próximo treino.</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":1350}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // [nome, séries, reps, unidade, tipo] tipo: C = composto, I = isolado, T = isometria
+    const rows = [
+      ['Agachamento com halteres', 3, '10–12', '', 'C'],
+      ['Agachamento búlgaro', 3, '8–12', 'por perna', 'C'],
+      ['Terra romeno unilateral', 2, '10–12', 'por perna', 'C'],
+      ['Elevação de panturrilhas', 3, '12–20', '', 'I'],
+      ['Crunch abdominal com carga', 3, '12–15', '', 'I'],
+      ['Prancha lateral', 2, '30–45', 'seg. por lado', 'T']
+    ];
+    const kinds = { C: 'Composto', I: 'Isolado', T: 'Isometria' };
+    const rest = { C: '2 min', I: '60–90 s', T: '60 s' };
+    return {
+      accent: '#FF9A4D', soft: 'rgba(255,154,77,0.14)',
+      weekday: 'SÁBADO', ab: 'B', title: 'PERNAS E CORE',
+      ex: rows.map((r, i) => ({ i: i + 1, n: r[0], s: r[1], r: r[2], per: r[3], kind: kinds[r[4]], d: rest[r[4]], unit: r[4] === 'T' ? 's' : 'kg' })),
+      prio: 'Hipertrofia das pernas, equilíbrio muscular e fortalecimento do core.'
+    };
+  }
+}
+</script>
+</body>
+</html>

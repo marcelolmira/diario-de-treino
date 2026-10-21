@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Plano de hipertrofia – semana</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&amp;family=Barlow:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E13}
+a{color:#5AA9FF}a:hover{color:#8FC5FF}
+</style>
+</helmet>
+<div style="width: 1800px; height: 1900px; box-sizing: border-box; padding: 56px; background: #0B0E13; color: #E9EDF3; font-family: 'Barlow', sans-serif; display: flex; flex-direction: column; gap: 32px">
+
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; border-bottom: 2px solid #232A35; padding-bottom: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px; letter-spacing: 0.2em; color: #8A94A6">PLANO DE HIPERTROFIA · 6 DIAS · 6 EXERCÍCIOS POR DIA</div>
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 76px; line-height: 1">TREINO DA SEMANA</h1>
+<div style="font-size: 20px; color: #C4CBD6">Academia do condomínio: halteres, barras, banco e polias · 45–60 min por sessão · 1–2 repetições de reserva</div>
+</div>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{week}}" as="w" hint-placeholder-count="7">
+<div style="width: 108px; box-sizing: border-box; padding: 10px 0; border-radius: 10px; background: #151A22; border: 1px solid #232A35; display: flex; flex-direction: column; align-items: center; gap: 2px">
+<div style="font-size: 15px; font-weight: 600; color: #8A94A6; letter-spacing: 0.08em">{{w.d}}</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 21px; font-weight: 700; color: {{w.c}}">{{w.t}}</div>
+<div style="font-size: 13px; font-weight: 600; color: #C4CBD6; min-height: 16px">{{w.bike}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="6">
+<div style="background: #12161D; border: 1px solid #232A35; border-top: 6px solid {{d.accent}}; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 22px 24px 18px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: 0.16em; color: {{d.accent}}">{{d.weekday}} · TREINO {{d.ab}}</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 1">{{d.title}}</div>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 72px 132px; padding: 10px 24px; background: #0E1218; border-top: 1px solid #232A35; border-bottom: 1px solid #232A35; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: #8A94A6">
+<div>EXERCÍCIO</div><div style="text-align: center">SÉRIES</div><div style="text-align: right">REPETIÇÕES</div>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column">
+<sc-for list="{{d.ex}}" as="e" hint-placeholder-count="6">
+<div style="flex-grow: 1; display: grid; grid-template-columns: minmax(0, 1fr) 72px 132px; align-items: center; padding: 8px 24px; border-bottom: 1px solid #1C222C">
+<div style="display: flex; gap: 12px; align-items: center; padding-right: 8px">
+<div style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; background: {{d.soft}}; color: {{d.accent}}; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center">{{e.i}}</div>
+<div style="font-size: 19px; font-weight: 600; line-height: 1.2">{{e.n}}</div>
+</div>
+<div style="text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700">{{e.s}}</div>
+<div style="text-align: right; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">{{e.r}}</div>
+</div>
+</sc-for>
+</div>
+<div style="padding: 16px 24px 20px; background: #0E1218; display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 13px; font-weight: 700; letter-spacing: 0.14em; color: {{d.accent}}">PRIORIDADE</div>
+<div style="font-size: 16px; line-height: 1.35; color: #C4CBD6">{{d.prio}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">
+<sc-for list="{{info}}" as="b" hint-placeholder-count="3">
+<div style="background: #12161D; border: 1px solid #232A35; border-radius: 16px; padding: 24px 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 14px; align-items: center">
+<div style="width: 44px; height: 44px; border-radius: 12px; background: #1B212B; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E9EDF3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{b.icon}}"></path></svg>
+</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700">{{b.title}}</div>
+</div>
+<sc-for list="{{b.items}}" as="t" hint-placeholder-count="4">
+<div style="display: flex; gap: 10px; align-items: flex-start; font-size: 17px; line-height: 1.4; color: #C4CBD6">
+<div style="width: 6px; height: 6px; border-radius: 3px; background: #8A94A6; flex-shrink: 0; margin-top: 10px"></div>
+<div>{{t}}</div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1800,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = {
+      push: { accent: '#5AA9FF', soft: 'rgba(90,169,255,0.14)' },
+      pull: { accent: '#5BD68A', soft: 'rgba(91,214,138,0.14)' },
+      legs: { accent: '#FF9A4D', soft: 'rgba(255,154,77,0.14)' }
+    };
+    const ex = (rows) => rows.map((r, i) => ({ i: i + 1, n: r[0], s: r[1], r: r[2] }));
+    const days = [
+      { ...C.push, weekday: 'SEGUNDA', ab: 'A', title: 'Peito, ombros e tríceps',
+        ex: ex([['Supino reto com halteres', 3, '6–10'], ['Supino inclinado com halteres', 3, '8–12'], ['Desenvolvimento com halteres', 2, '8–12'], ['Elevação lateral', 3, '12–15'], ['Crucifixo na polia', 2, '10–15'], ['Tríceps na polia', 2, '10–15']]),
+        prio: 'Espessura do peito e desenvolvimento dos deltoides.' },
+      { ...C.pull, weekday: 'TERÇA', ab: 'A', title: 'Costas e bíceps',
+        ex: ex([['Puxada alta na polia', 3, '8–12'], ['Remada curvada com barra', 3, '6–10'], ['Remada unilateral com halter', 2, '8–12'], ['Pullover na polia', 2, '12–15'], ['Rosca direta com barra', 3, '8–12'], ['Rosca martelo com halteres', 2, '10–15']]),
+        prio: 'Largura dorsal, espessura das costas e bíceps.' },
+      { ...C.legs, weekday: 'QUARTA', ab: 'A', title: 'Pernas e core',
+        ex: ex([['Agachamento goblet', 3, '8–12'], ['Terra romeno com halteres', 3, '8–12'], ['Afundo reverso com halteres', 2, '10/perna'], ['Elevação de panturrilhas', 3, '12–20'], ['Crunch abdominal na polia', 3, '12–15'], ['Prancha abdominal', 3, '30–60 s']]),
+        prio: 'Quadríceps, posteriores e estabilidade abdominal.' },
+      { ...C.push, weekday: 'QUINTA', ab: 'B', title: 'Peito, ombros e tríceps',
+        ex: ex([['Supino inclinado com halteres', 3, '6–10'], ['Supino reto com barra ou halteres', 2, '8–12'], ['Elevação lateral na polia', 3, '12–15'], ['Crucifixo inverso com halteres', 3, '12–15'], ['Face pull na polia', 2, '12–15'], ['Tríceps francês com halter', 3, '10–12']]),
+        prio: 'Peito superior, deltoides laterais e posteriores.' },
+      { ...C.pull, weekday: 'SEXTA', ab: 'B', title: 'Costas e bíceps',
+        ex: ex([['Puxada alta com pegada neutra', 3, '8–12'], ['Remada baixa na polia', 3, '8–12'], ['Remada com peito apoiado no banco', 2, '10–12'], ['Pullover com braços estendidos na polia', 2, '12–15'], ['Rosca inclinada com halteres', 3, '10–12'], ['Rosca concentrada', 2, '10–15']]),
+        prio: 'Densidade das costas e desenvolvimento completo dos bíceps.' },
+      { ...C.legs, weekday: 'SÁBADO', ab: 'B', title: 'Pernas e core',
+        ex: ex([['Agachamento com halteres', 3, '10–12'], ['Agachamento búlgaro', 3, '8–12/perna'], ['Terra romeno unilateral', 2, '10–12/perna'], ['Elevação de panturrilhas', 3, '12–20'], ['Crunch abdominal com carga', 3, '12–15'], ['Prancha lateral', 2, '30–45 s/lado']]),
+        prio: 'Hipertrofia das pernas, equilíbrio muscular e fortalecimento do core.' }
+    ];
+    const week = [
+      { d: 'SEG', t: 'PEITO A', c: C.push.accent, bike: '+ Peloton' },
+      { d: 'TER', t: 'COSTAS A', c: C.pull.accent, bike: '' },
+      { d: 'QUA', t: 'PERNAS A', c: C.legs.accent, bike: '' },
+      { d: 'QUI', t: 'PEITO B', c: C.push.accent, bike: '+ Peloton' },
+      { d: 'SEX', t: 'COSTAS B', c: C.pull.accent, bike: '+ Peloton' },
+      { d: 'SÁB', t: 'PERNAS B', c: C.legs.accent, bike: '' },
+      { d: 'DOM', t: 'DESCANSO', c: '#8A94A6', bike: '' }
+    ];
+    const info = [
+      { title: 'Progressão de cargas', icon: 'M3 17l6-6 4 4 8-8M15 7h6v6', items: [
+        'Trabalhe dentro da faixa de repetições, deixando 1–2 repetições de reserva.',
+        'Completou o topo da faixa em todas as séries? Aumente a carga no treino seguinte.',
+        'Ficou abaixo do mínimo? Mantenha a carga; se repetir, reduza cerca de 10%.',
+        'Use a página “Progressão de cargas” para conferir cada exercício.'] },
+      { title: 'Descanso e ritmo', icon: 'M12 7v5l3 2M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM9 2h6', items: [
+        'Exercícios compostos: 2 minutos de descanso.',
+        'Exercícios isolados: 60–90 segundos.',
+        'Aumente o intervalo quando precisar para manter a técnica.',
+        'Faça aquecimento antes do primeiro exercício pesado.'] },
+      { title: 'Peloton e recuperação', icon: 'M5 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM5 15l4-7h6l4 7M9 8l3 7', items: [
+        'Três sessões de 25–30 min: segunda, quinta e sexta, no fim da tarde.',
+        'Intensidade predominantemente moderada. Uma 4ª sessão leve só se estiver recuperando bem.',
+        'Este é o volume inicial. Não precisa aumentar toda semana.',
+        'Acompanhe força, sono e fadiga. Se faltar recuperação, reduza séries ou frequência antes de aumentar.'] }
+    ];
+    return { days, week, info };
+  }
+}
+</script>
+</body>
+</html>
