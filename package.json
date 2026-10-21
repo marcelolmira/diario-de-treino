@@ -1,0 +1,16 @@
+{
+  "name": "diario-de-treino",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Diário de Treino: plano de hipertrofia com registro de cargas e progressão, salvo em Postgres.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "8.13.1"
+  }
+}

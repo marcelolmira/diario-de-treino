@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B0E13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Treino">
 </head>
 <body>
 <title>Diário de Treino</title>
@@ -27,6 +30,10 @@
   --push:#5AA9FF; --pull:#5BD68A; --legs:#FF9A4D; --ok:#5BD68A; --warn:#FF9A4D; --info:#5AA9FF; --on-acc:#0B0E13;
   color-scheme:dark }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -105,6 +112,12 @@ input[type=number]:focus{border-color:var(--acc);outline:none;box-shadow:0 0 0 3
 .guide{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
 .guide h3{margin:0;font-family:var(--display);font-size:24px;font-weight:700}
 .guide ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.muted{margin:0;color:var(--muted);font-size:15px}
+.lbl{display:inline-flex;align-items:center;cursor:pointer}
+.login{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px;max-width:420px;margin:24px auto 0;width:100%}
+.login h2{margin:0;font-family:var(--display);font-size:30px}
+.login input{height:52px;width:100%;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;font-size:20px}
+.login .primary{flex:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom, 0px));background:var(--fg);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
 @media (max-width:380px){ .days b{font-size:16px} h1{font-size:34px} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
@@ -192,7 +205,7 @@ const todayIdx = (() => { const d = new Date().getDay(); return d === 0 ? -1 : d
 const state = { view:'treino', day: todayIdx < 0 ? 0 : todayIdx, open: null };
 const logs = {};      // exId -> [{date, load, reps:[...]}]
 const drafts = {};    // exId -> {load, reps:[]}
-let db = null, storeMode = 'local', pendingRender = false;
+let pendingRender = false;
 
 const $app = document.getElementById('app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -235,37 +248,74 @@ function recommend(e, session){
     next: load };
 }
 
-// ---------- armazenamento ----------
-function loadLocal(){
-  try { const raw = localStorage.getItem('diario-treino-logs'); if (raw) Object.assign(logs, JSON.parse(raw)); } catch(_){}
+// ---------- armazenamento (servidor + cópia no aparelho) ----------
+const LS_PIN = 'diario-pin', LS_CACHE = 'diario-treino-logs', LS_PENDING = 'diario-pending';
+function lsGet(k){ try { return localStorage.getItem(k); } catch(_) { return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, v); } catch(_){} }
+function lsDel(k){ try { localStorage.removeItem(k); } catch(_){} }
+let pin = lsGet(LS_PIN) || '';
+let syncState = 'idle';   // idle | ok | offline
+let loginError = '';
+let pending = new Set((() => { try { return JSON.parse(lsGet(LS_PENDING) || '[]'); } catch(_) { return []; } })());
+function saveCache(){ lsSet(LS_CACHE, JSON.stringify(logs)); lsSet(LS_PENDING, JSON.stringify([...pending])); }
+async function api(path, opts = {}){
+  let r;
+  try { r = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', 'x-app-pin': pin, ...(opts.headers || {}) } }); }
+  catch(_) { throw { code: 'offline' }; }
+  if (r.status === 401) { pin = ''; lsDel(LS_PIN); loginError = 'Código incorreto. Tente de novo.'; render(); throw { code: 'auth' }; }
+  if (!r.ok) { let m = 'Erro ' + r.status; try { m = (await r.json()).error || m; } catch(_){} throw { code: 'http', message: m }; }
+  return r;
 }
-function saveLocal(){
-  try { localStorage.setItem('diario-treino-logs', JSON.stringify(logs)); } catch(_){}
+async function pull(){
+  const data = await (await api('/api/logs')).json();
+  for (const [id, s] of Object.entries(data.logs || {})) if (!pending.has(id) && Array.isArray(s)) logs[id] = s;
+  saveCache();
+}
+async function flush(){
+  for (const id of [...pending]) {
+    await api('/api/logs/' + id, { method: 'PUT', body: JSON.stringify({ sessions: logs[id] || [] }) });
+    pending.delete(id); saveCache();
+  }
+}
+async function sync(){
+  if (!pin) return;
+  try { await flush(); await pull(); syncState = 'ok'; }
+  catch(e) { if (e.code !== 'auth') syncState = 'offline'; }
+  requestRender();
 }
 async function persist(id){
-  const sessions = logs[id] || [];
-  if (db) {
-    try { await db.doc('logs/' + id).set({ sessions, updatedAt: new Date().toISOString() }); return true; }
-    catch (err) {
-      if (err && err.code === 'unavailable') {
-        await new Promise(r => setTimeout(r, 600 + Math.random()*600));
-        try { await db.doc('logs/' + id).set({ sessions, updatedAt: new Date().toISOString() }); return true; } catch(_){}
-      }
-      toast('Não foi possível salvar agora. Confira a conexão e tente de novo.');
-      return false;
-    }
-  }
-  saveLocal(); return true;
+  pending.add(id); saveCache();
+  try { await flush(); syncState = 'ok'; }
+  catch(e) { if (e.code !== 'auth') { syncState = 'offline'; toast('Sem conexão. O registro ficou no aparelho e será enviado assim que a internet voltar.'); } }
+  return true;
 }
 async function initStore(){
-  loadLocal();
-  try { db = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch(_) { db = null; }
-  if (!db) { render(); return; }
-  storeMode = 'db';
-  db.collection('logs').onSnapshot(snap => {
-    snap.docs.forEach(d => { const data = d.data(); if (data && Array.isArray(data.sessions)) logs[d.id] = data.sessions.slice(); });
-    requestRender();
-  }, () => { storeMode = 'local'; requestRender(); });
+  try { Object.assign(logs, JSON.parse(lsGet(LS_CACHE) || '{}')); } catch(_){}
+  render();
+  await sync();
+  setInterval(sync, 60000);
+  window.addEventListener('online', sync);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+}
+async function exportBackup(){
+  try {
+    const blob = await (await api('/api/export')).blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'diario-de-treino-' + todayStr() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    toast('Backup baixado');
+  } catch(e) { if (e.code !== 'auth') toast(e.message || 'Sem conexão. Tente de novo.'); }
+}
+async function importBackup(file){
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const r = await (await api('/api/import', { method: 'POST', body: JSON.stringify({ logs: data.logs }) })).json();
+    await pull(); render();
+    toast('Backup restaurado: ' + r.imported + ' exercícios');
+  } catch(e) { if (e.code !== 'auth') toast(e instanceof SyntaxError ? 'Esse arquivo não é um backup do Diário de Treino.' : (e.message || 'Não foi possível restaurar.')); }
 }
 
 // ---------- render ----------
@@ -346,7 +396,7 @@ function renderTreino(){
     '<div class="dayhead"><div class="eyebrow">' + d.name + ' · treino ' + d.ab + '</div><h2>' + d.title + '</h2><p>' + esc(d.prio) + '</p>' +
     '<div class="progress"><div class="bar"><i style="width:' + Math.round(doneCount / 6 * 100) + '%"></i></div>' + doneCount + ' de 6 hoje</div></div>' +
     '<div class="list">' + d.ex.map(e => exCard(d, e)).join('') + '</div></section>';
-  if (storeMode !== 'db') html += '<div class="notice">Os registros estão salvos só neste navegador.</div>';
+  if (pending.size) html += '<div class="notice">' + (syncState === 'offline' ? 'Sem conexão. ' : '') + pending.size + (pending.size > 1 ? ' exercícios aguardando' : ' exercício aguardando') + ' envio ao servidor. Os dados estão guardados no aparelho.</div>';
   return html;
 }
 
@@ -359,10 +409,23 @@ function renderPlano(){
     ['Descanso e ritmo', ['Sessões de 45–60 minutos.', 'Compostos: 2 minutos de descanso. Isolados: 60–90 segundos.', 'Aumente o intervalo quando precisar. Faça aquecimento antes do primeiro exercício pesado.']],
     ['Peloton e recuperação', ['Três sessões de 25–30 min: segunda, quinta e sexta, no fim da tarde, em intensidade moderada.', 'Uma quarta sessão leve só se estiver recuperando bem.', 'Este é o volume inicial, não precisa aumentar toda semana. Acompanhe força, sono e fadiga; se faltar recuperação, reduza séries ou frequência antes de aumentar o trabalho.']]
   ].map(g => '<div class="guide"><h3>' + g[0] + '</h3><ul>' + g[1].map(t => '<li>' + t + '</li>').join('') + '</ul></div>').join('');
-  return '<div class="plan">' + days + guides + '</div>';
+  const backup = '<div class="guide"><h3>Backup</h3><p class="muted">Seus registros ficam no servidor, com histórico de cada alteração. Baixe uma cópia de vez em quando para guardar onde quiser.</p>' +
+    '<div class="actions"><button type="button" class="ghost" id="btn-export">Baixar backup</button>' +
+    '<label class="ghost lbl" for="file-import">Restaurar backup</label><input type="file" id="file-import" accept="application/json,.json" hidden>' +
+    '<button type="button" class="ghost" id="btn-logout">Sair deste aparelho</button></div></div>';
+  return '<div class="plan">' + days + guides + backup + '</div>';
+}
+
+function renderLogin(){
+  return '<form class="login" id="login" novalidate><h2>Entrar</h2><p class="muted">Digite o código de acesso do seu Diário de Treino. Ele fica salvo neste aparelho.</p>' +
+    '<div class="field"><label for="pin">Código de acesso</label><input id="pin" type="password" autocomplete="current-password" required></div>' +
+    (loginError ? '<div class="err" role="alert">' + esc(loginError) + '</div>' : '') +
+    '<button type="submit" class="primary">Entrar</button></form>';
 }
 
 function render(){
+  if (!pin) { document.querySelector('.views').hidden = true; $app.innerHTML = renderLogin(); return; }
+  document.querySelector('.views').hidden = false;
   document.getElementById('tab-treino').setAttribute('aria-selected', state.view === 'treino');
   document.getElementById('tab-plano').setAttribute('aria-selected', state.view === 'plano');
   $app.innerHTML = state.view === 'treino' ? renderTreino() : renderPlano();
@@ -384,6 +447,8 @@ $app.addEventListener('click', async ev => {
   const tog = ev.target.closest('[data-toggle]');
   if (tog) { const id = tog.dataset.toggle; state.open = state.open === id ? null : id; render();
     const first = document.querySelector('[data-form="' + id + '"] input'); if (first && state.open) first.focus({ preventScroll: true }); return; }
+  if (ev.target.id === 'btn-export') { exportBackup(); return; }
+  if (ev.target.id === 'btn-logout') { pin = ''; lsDel(LS_PIN); loginError = ''; render(); return; }
   const undo = ev.target.closest('[data-undo]');
   if (undo) {
     const id = undo.dataset.undo;
@@ -401,8 +466,20 @@ $app.addEventListener('input', ev => {
   if (t.dataset.rep) { (drafts[t.dataset.rep] ||= { load:'', reps:[] }).reps[+t.dataset.i] = t.value; }
 });
 
+$app.addEventListener('change', ev => {
+  if (ev.target.id === 'file-import' && ev.target.files[0]) importBackup(ev.target.files[0]);
+});
+
 $app.addEventListener('submit', async ev => {
   ev.preventDefault();
+  if (ev.target.id === 'login') {
+    const v = document.getElementById('pin').value.trim();
+    if (!v) { loginError = 'Digite o código.'; render(); return; }
+    pin = v; loginError = ''; lsSet(LS_PIN, v); render();
+    await sync();
+    if (pin) toast('Conectado');
+    return;
+  }
   const id = ev.target.dataset.form; const f = findEx(id); if (!f) return;
   const e = f.e; const dr = drafts[id] || { load:'', reps:[] };
   const reps = []; for (let i = 0; i < e.s; i++) reps.push(parse(dr.reps[i]));
@@ -423,7 +500,6 @@ $app.addEventListener('submit', async ev => {
   } else { logs[id] = prev; render(); }
 });
 
-render();
 initStore();
 })();
 </script>

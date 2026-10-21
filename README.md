@@ -4,13 +4,27 @@ Plano de hipertrofia de 6 dias (6 exercícios por dia) com registro de cargas e 
 
 ## Conteúdo
 
-- `app/index.html`: o app completo em um único arquivo. Mostra o treino do dia, registra carga e repetições por série, guarda o histórico e diz se é hora de aumentar, manter ou reduzir a carga.
+- `public/index.html`: o app. Mostra o treino do dia, registra carga e repetições por série, guarda o histórico e diz se é hora de aumentar, manter ou reduzir a carga.
+- `server.js`: servidor Node que entrega o app e guarda os registros no Postgres.
 - `design/`: as artes do plano (quadro da semana, uma página por dia e a página de progressão), no formato do canvas de design do Claude.
 
 ## Onde os dados ficam
 
-- Publicado no Claude, o app salva os registros no banco do próprio artifact, disponível em qualquer aparelho.
-- Aberto direto no navegador (ou num servidor estático, como GitHub Pages), salva só naquele navegador (`localStorage`).
+- **Postgres** (tabela `logs`): o estado atual de cada exercício.
+- **Histórico** (tabela `logs_history`): cada gravação fica registrada, então um registro apagado por engano pode ser recuperado.
+- **No aparelho**: o app guarda uma cópia local. Sem internet, o registro fica no celular e é enviado quando a conexão volta.
+- **Backup**: na aba Plano, "Baixar backup" gera um arquivo JSON; "Restaurar backup" carrega de volta.
+
+## Hospedagem (Railway)
+
+Variáveis do serviço:
+
+| Variável | Valor |
+| --- | --- |
+| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` |
+| `APP_PIN` | código de acesso pedido na tela de entrada |
+
+Rodar localmente: `npm install`, depois `DATABASE_URL=... APP_PIN=... npm start`.
 
 ## Plano
 
