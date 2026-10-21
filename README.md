@@ -5,7 +5,8 @@ Plano de hipertrofia de 6 dias (6 exercícios por dia) com registro de cargas e 
 ## Conteúdo
 
 - `public/index.html`: o app. Mostra o treino do dia, registra carga e repetições por série, guarda o histórico e diz se é hora de aumentar, manter ou reduzir a carga.
-- `server.js`: servidor Node que entrega o app e guarda os registros no Postgres.
+- `api/[...path].js` e `lib/api.js`: a API que guarda os registros no Postgres (funções da Vercel).
+- `bin/server.js`: servidor para rodar localmente ou em hospedagem com processo contínuo (Railway).
 - `design/`: as artes do plano (quadro da semana, uma página por dia e a página de progressão), no formato do canvas de design do Claude.
 
 ## Onde os dados ficam
@@ -15,14 +16,14 @@ Plano de hipertrofia de 6 dias (6 exercícios por dia) com registro de cargas e 
 - **No aparelho**: o app guarda uma cópia local. Sem internet, o registro fica no celular e é enviado quando a conexão volta.
 - **Backup**: na aba Plano, "Baixar backup" gera um arquivo JSON; "Restaurar backup" carrega de volta.
 
-## Hospedagem (Railway)
+## Hospedagem (Vercel)
 
-Variáveis do serviço:
+1. Importe este repositório na Vercel (preset "Other", sem build).
+2. Em **Storage**, conecte um banco **Neon (Postgres)** ao projeto. Ele cria a variável `DATABASE_URL`.
+3. Em **Settings → Environment Variables**, crie `APP_PIN` com o código de acesso.
+4. Faça um novo deploy. Teste em `/api/health`.
 
-| Variável | Valor |
-| --- | --- |
-| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` |
-| `APP_PIN` | código de acesso pedido na tela de entrada |
+As tabelas são criadas sozinhas no primeiro acesso.
 
 Rodar localmente: `npm install`, depois `DATABASE_URL=... APP_PIN=... npm start`.
 
