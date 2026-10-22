@@ -18,6 +18,13 @@ Plano de hipertrofia de 6 dias (6 exercícios por dia) com registro de cargas e 
 - **No aparelho**: o app guarda uma cópia local. Sem internet, o registro fica no celular e é enviado quando a conexão volta.
 - **Backup**: na aba Plano, "Baixar backup" gera um arquivo JSON; "Restaurar backup" carrega de volta.
 
+## Backup do app Android (personal-workout-app)
+
+A mesma API guarda os backups do app de musculação, protegidos pelo mesmo `APP_PIN`:
+
+- `PUT /api/workout-backup` com `{ "snapshot": { ... } }`: grava uma cópia (até 4 MB). Ficam os 60 backups mais recentes, na tabela `workout_app_backups`.
+- `GET /api/workout-backup`: devolve o backup mais recente.
+
 ## Hospedagem (Vercel)
 
 1. Importe este repositório na Vercel (preset "Other", sem build).
