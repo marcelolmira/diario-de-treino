@@ -1,5 +1,7 @@
 # Diário de Treino
 
+App: https://diario-de-treino-alpha.vercel.app
+
 Plano de hipertrofia de 6 dias (6 exercícios por dia) com registro de cargas e recomendação de progressão.
 
 ## Conteúdo
